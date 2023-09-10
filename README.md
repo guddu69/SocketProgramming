@@ -11,5 +11,7 @@
 **Video:** https://www.youtube.com/watch?v=LtXEMwSG5-8
 
 **command example:**
+
   **compile:** gcc -o server rserver.c
+  
   **run: **./server
