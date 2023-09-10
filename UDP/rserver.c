@@ -4,39 +4,32 @@
 #include<sys/types.h>
 #include<sys/socket.h>
 
+#include<unistd.h>
 #include<netinet/in.h>
 
-#include <unistd.h> // IMP added afterwards for mac users
-#define PORT 8080
+#include<string.h>
+
 int main(){
 
-    // creating socket
     int socket_n = socket(AF_INET, SOCK_DGRAM, 0);
 
-    // defining socket address
-    struct sockaddr_in server_address;
+    struct sockaddr_in server_address, client_address;
     server_address.sin_family = AF_INET;
-    server_address.sin_port = htons(PORT);
+    server_address.sin_port = htons(8080);
     server_address.sin_addr.s_addr = INADDR_ANY;
 
-    // binding to specific port number and IP
-    bind(socket_n, (struct sockaddr*) &server_address, sizeof(server_address));
+    socklen_t len = sizeof(client_address);
 
-    struct sockaddr_in client_addr;
+    bind(socket_n, (struct sockaddr*)&server_address, sizeof(server_address));
 
-    // recieving message from client
     char rmsg[256];
-    socklen_t client_n_len = sizeof(client_addr);
-    ssize_t bytes_rev = recvfrom(socket_n, rmsg, sizeof(rmsg), 0, (struct sockaddr*)&client_addr, &client_n_len);
+    ssize_t brev = recvfrom(socket_n, rmsg, sizeof(rmsg), 0, (struct sockaddr*)&client_address, &len);
 
-    // echoing msg
-    rmsg[bytes_rev] = '\0'; // Null-terminate the received message
-    printf("Echoing back: %s",rmsg);
+    printf("Echo back: %s", rmsg);
 
-    // sending the message
-    ssize_t bytes_sent = sendto(socket_n, rmsg, bytes_rev, 0, (struct sockaddr*)&client_addr, sizeof(client_addr));
+    rmsg[brev] = '\0';
+    sendto(socket_n, rmsg, brev, 0, (struct sockaddr*)&client_address, sizeof(client_address));
 
-    // closing sockets
     close(socket_n);
 
     return 0;
