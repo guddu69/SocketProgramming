@@ -9,3 +9,7 @@
 **UDP chat-bot:** Implement Chat application between server and client using UDP socket programming in a connection-less scenario. In Chat application server and client application can chat with each other through text messages. The chat ends when server or client application sends “exit” message.
 
 **Video:** https://www.youtube.com/watch?v=LtXEMwSG5-8
+
+**command example:**
+  **compile:** gcc -o server rserver.c
+  **run: **./server
