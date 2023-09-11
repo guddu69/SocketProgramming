@@ -4,55 +4,40 @@
 #include<sys/types.h>
 #include<sys/socket.h>
 
+#include<unistd.h>
 #include<netinet/in.h>
-#include <unistd.h> // IMP added afterwards for mac users
-#include <string.h>
-#define PORT 8080
+
+#include<string.h>
+
 int main(){
-    
-    // creating socket
+
     int socket_n = socket(AF_INET, SOCK_DGRAM, 0);
 
-    // allocating address
-    struct sockaddr_in server_address;
-    server_address.sin_family = AF_INET;
-    server_address.sin_port = htons(PORT);
-    server_address.sin_addr.s_addr = INADDR_ANY;
+    struct sockaddr_in client_address;
+    client_address.sin_family = AF_INET;
+    client_address.sin_port = htons(8080);
+    client_address.sin_addr.s_addr = INADDR_ANY;
 
-    while (1)
-    {
-        // sending message to server
+    while(1){
+
         char smsg[256];
-        printf("Enter the message: ");
-        fgets(smsg , sizeof(smsg), stdin); // taking input from user
-        ssize_t bytes_sent = sendto(socket_n, smsg, strlen(smsg), 0, (struct sockaddr*)&server_address, sizeof(server_address));
+        printf("Enter: ");
+        fgets(smsg, sizeof(smsg), stdin);
+        sendto(socket_n, smsg, sizeof(smsg),0, (struct sockaddr*)&client_address, sizeof(client_address));
 
-        if (strcmp(smsg, "exit\n")==0)
-        {
+        if(strcmp(smsg,"exit\n")==0)
             break;
-        }
 
-        printf("Sending: %s",smsg);
-
-        // receving message from client
         char rmsg[256];
-        socklen_t server_addr_len = sizeof(server_address);
-        ssize_t bytes_received = recvfrom(socket_n, rmsg, sizeof(rmsg), 0, (struct sockaddr*)&server_address, &server_addr_len);
+        socklen_t len = sizeof(client_address);
+        recvfrom(socket_n, rmsg, sizeof(rmsg), 0, (struct sockaddr*)&client_address, &len);
+        printf("Server: %s",rmsg);
 
-        if (strcmp(rmsg, "exit\n")==0)
-        {
+        if(strcmp(rmsg,"exit\n")==0)
             break;
-        }
 
-        // Null-terminate the received message
-        rmsg[bytes_received] = '\0';
-
-        // printing msg
-        printf("Recieved: %s\n", rmsg);
     }
-    
 
-    // closing socket
     close(socket_n);
 
     return 0;
